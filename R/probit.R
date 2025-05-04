@@ -9,8 +9,13 @@ probit <- function(data, control_dosis = 0, conf.level = 0.95) {
 #' @export
 #'
 #' @examples
-#' datos <- importar(data)
-#' probit(datos)
+#'
+#' Boana_Lambda <- data %>% filter(especie=="Boana pulchella",
+#'  exposicion_horas==96,
+#'  compuesto=="Lambdacialotrina") %>%
+#'  group_by(dosis) %>%
+#'  summarise(n=sum(n), respuesta=sum(respuesta))
+#'  probit(Boana_Lambda)
 
         # Verificar y corregir datos
   if (!all(c("dosis", "n", "respuesta") %in% colnames(data))) {
@@ -27,15 +32,15 @@ probit <- function(data, control_dosis = 0, conf.level = 0.95) {
     data$respuesta <- pmax(0, pmin(data$respuesta, data$n))  # Asegurar valores entre 0 y n
   }
 
-  data <- data %>% dplyr::filter(dosis != 0)
+  #data <- data %>% dplyr::filter(dosis != 0)
 
-  # Corrección de Litchfield-Wilcoxon para 0 y 1
-  data$r_adj <- data$respuesta+ 0.5
-  data$n_adj <- data$n + 1
-  data$p <- data$r_adj / data$n_adj
+  # # Corrección de Litchfield-Wilcoxon para 0 y 1
+  # data$r_adj <- data$respuesta #+ 0.5
+  # data$n_adj <- data$n #+ 1
+  # data$p <- data$r_adj / data$n_adj
 
   # Ajustar modelo Probit
-  model <- stats::glm(cbind(r_adj, n_adj - r_adj) ~ log10(dosis),
+  model <- stats::glm(cbind(respuesta, n - respuesta) ~ log10(dosis),
                family = stats::binomial(link = "probit"),
                data = data)
 
@@ -61,7 +66,7 @@ probit <- function(data, control_dosis = 0, conf.level = 0.95) {
   se_slope <- sqrt(vcov_matrix[2,2]) * stats::dnorm(0)
 
   # Estadísticos de bondad de ajuste
-  predicted <- stats::predict(model, type = "response") * data$n_adj
+  predicted <- stats::predict(model, type = "response") * data$n
 
 
   # Estadísticos de bondad de ajuste

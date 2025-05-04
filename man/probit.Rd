@@ -20,6 +20,11 @@ Una lista.
 Función para análisis Probit con correcciones
 }
 \examples{
-datos <- importar(data)
-probit(datos)
+
+Boana_Lambda <- data \%>\% filter(especie=="Boana pulchella",
+ exposicion_horas==96,
+ compuesto=="Lambdacialotrina") \%>\%
+ group_by(dosis) \%>\%
+ summarise(n=sum(n), respuesta=sum(respuesta))
+ probit(Boana_Lambda)
 }
