@@ -43,7 +43,10 @@ data <- data_abbot %>% filter(dosis!=0)
 
 model <- glm(Pabbott ~ log10(dosis),
              family = binomial(link = "probit"),
+             weights = n,
              data = data)
+
+
 summary(model)
 # Calcular LD50 y su intervalo de confianza
 intercept <- stats::coef(model)[1]
@@ -52,6 +55,39 @@ log_ld50 <- (0 - intercept) / slope
 ld50 <- 10^log_ld50
 
 
+
+confint(model)
+# Asegúrate de cargar el paquete MASS
+library(MASS)
+
+# Generar secuencia de probabilidades del 1% al 99%
+probabilidades <- seq(0.0, 0.99, by = 0.01)
+
+# Función para calcular DLp y su intervalo de confianza
+calcular_dlp <- function(model, p) {
+  dl <- dose.p(model, p = p)        # Calcula en escala log10
+  log_dl <- dl                   # Valor en log10(dosis)
+  se <- attr(dl, "SE")             # Error estándar en log10
+
+  # Convertir a escala original (dosis)
+  dl_estimada <- 10^log_dl
+  li <- 10^(log_dl - 1.96 * se)    # Límite inferior (95% CI)
+  ls <- 10^(log_dl + 1.96 * se)    # Límite superior (95% CI)
+
+  data.frame(
+    Probabilidad = p,
+    DL = dl_estimada,
+    LI = li,
+    LS = ls
+  )
+}
+
+# Aplicar la función a todas las probabilidades
+resultados <- lapply(probabilidades, function(p) calcular_dlp(model, p))
+resultados_df <- do.call(rbind, resultados)
+
+# Mostrar resultados (ejemplo)
+(resultados_df)
 # Error estándar usando método delta
 vcov_matrix <- stats::vcov(model)
 var_log_ld50 <- (vcov_matrix[1,1] + vcov_matrix[2,2]*(log_ld50^2) +
@@ -84,3 +120,54 @@ p_value <- stats::pchisq(chi_sq, df, lower.tail = FALSE)
 chi_crit <-  stats::qchisq(p = 1 - 0.05, df = df_deviance)
 
 aic <- stats::AIC(model)
+
+
+
+# Coeficientes del modelo
+b0 <- coef(model)[1]  # Intercepto
+b1 <- coef(model)[2]  # Pendiente (coeficiente de log10(dosis))
+vcov_matrix <- vcov(model)  # Matriz de varianza-covarianza
+
+# Secuencia de probabilidades (1% a 99%)
+probabilidades <- c(0.01, 0.05, 0.1, 0.15, 0.5, 0.85, 0.9, 0.95, 0.99)
+
+# Función para calcular DLp y su IC
+calcular_dlp_manual <- function(p) {
+  # Valor de probit para la probabilidad p
+  probit_p <- qnorm(p)
+
+  # Calcular log10(DLp)
+  log_dlp <- (probit_p - b0) / b1
+
+  # Aplicar método delta para el error estándar
+  gradiente <- c(
+    -1 / b1,                     # Derivada respecto al intercepto (b0)
+    -(probit_p - b0) / (b1^2)    # Derivada respecto a la pendiente (b1)
+  )
+
+  # Calcular varianza y error estándar
+  var_log_dlp <- t(gradiente) %*% vcov_matrix %*% gradiente
+  se_log_dlp <- sqrt(var_log_dlp)
+
+  # Convertir a escala original y crear dataframe
+  data.frame(
+    Probabilidad = p,
+    DL = 10^log_dlp,
+    LI = 10^(log_dlp - 1.96 * se_log_dlp),
+    LS = 10^(log_dlp + 1.96 * se_log_dlp)
+  )
+}
+
+# Calcular para todas las probabilidades
+resultados <- lapply(probabilidades, calcular_dlp_manual)
+resultados_df <- do.call(rbind, resultados)
+
+# Mostrar resultados
+rownames(resultados_df) <- NULL
+resultados_df$Probabilidad <- resultados_df$Probabilidad
+(resultados_df)
+
+
+
+plot(qnorm(resultados_df$Probabilidad), log10(resultados_df$DL), type = "l")
+points(qnorm(data$Presp), log10(data$dosis), pch = 19, col = "red")
