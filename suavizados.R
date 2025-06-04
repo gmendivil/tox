@@ -1,50 +1,54 @@
-corr_abbott <- function(df, control = 0){
-  ctrl <- df[df$dosis == control, ]
-  Pctrl <- ctrl$suavizados
-  Presp <- datos[datos$dosis != 0, ]
-  df$Presp <- df$respuesta / df$n
-  Pabbott <- (df$Presp-Pctrl)/(1- Pctrl )
-  df$Pabbott <- Pabbott
-  df[1,ncol(df)] <- 0
-  df$Pabbott <- ifelse(df$Pabbott < 0,  (0.5/(df$n+1)), df$Pabbott)
-  return(df)
-}
+# corr_abbott <- function(df, control = 0){
+#   ctrl <- df[df$dosis == control, ]
+#   Pctrl <- ctrl$suavizados
+#   Presp <- datos[datos$dosis != 0, ]
+#   df$Presp <- df$respuesta / df$n
+#   Pabbott <- (df$Presp-Pctrl)/(1- Pctrl )
+#   df$Pabbott <- Pabbott
+#   df[1,ncol(df)] <- 0
+#   df$Pabbott <- ifelse(df$Pabbott < 0,  (0.5/(df$n+1)), df$Pabbott)
+#   return(df)
+# }
 
-suavizar <- function(x) {
-  n <- nrow(x)
-  z <- x$respuesta / x$n
-  if (n <= 1) return(x)  # No hay nada que suavizar
+# suavizar <- function(x) {
+#   n <- nrow(x)
+#   z <- x$respuesta / x$n
+#   if (n <= 1) return(x)  # No hay nada que suavizar
+#
+#   for (i in 2:n) {
+#     if (z[i] < z[i - 1]) {  # Verifica si hay un incremento no permitido
+#       # Calcula el promedio de todos los elementos desde 1 hasta i
+#       avg <- mean(z[1:i])
+#       # Asigna el promedio a todos los elementos en la ventana
+#       z[1:i] <- avg
+#     }
+#   }
+#   x$suavizados <- z
+#   return(x)
+# }
 
-  for (i in 2:n) {
-    if (z[i] < z[i - 1]) {  # Verifica si hay un incremento no permitido
-      # Calcula el promedio de todos los elementos desde 1 hasta i
-      avg <- mean(z[1:i])
-      # Asigna el promedio a todos los elementos en la ventana
-      z[1:i] <- avg
-    }
-  }
-  x$suavizados <- z
-  return(x)
-}
+dai <- data
+datos <- data %>% dplyr::filter(especie=="Boana pulchella",
+              exposicion_horas==96,compuesto=="Lambdacialotrina") %>%
+              dplyr::group_by(dosis) %>%
+              dplyr::summarise(n=sum(n), respuesta=sum(respuesta))
 
-# Datos con log(conc) para tratamientos
-datos <- data.frame(
-  dosis = c(0, 4.0, 4.5, 5.0, 5.5, 6.0),
-  respuesta = c(4,2, 12, 19, 20, 24),
-  n = rep(30, 6)
-)
 
 datos_suav<- suavizar(datos)
 
 data_abbot <- corr_abbott(datos_suav)
+
+probit(datos)
+
+
 library(dplyr)
 
-data <- data_abbot %>% filter(dosis!=0)
+datos <- data_abbot %>% filter(dosis!=0)
 
 model <- glm(Pabbott ~ log10(dosis),
              family = binomial(link = "probit"),
              weights = n,
-             data = data)
+             data = datos)
 
 
 summary(model)
@@ -65,7 +69,7 @@ probabilidades <- seq(0.0, 0.99, by = 0.01)
 
 # Función para calcular DLp y su intervalo de confianza
 calcular_dlp <- function(model, p) {
-  dl <- dose.p(model, p = p)        # Calcula en escala log10
+  dl <- MASS::dose.p(model, p = p)        # Calcula en escala log10
   log_dl <- dl                   # Valor en log10(dosis)
   se <- attr(dl, "SE")             # Error estándar en log10
 
@@ -134,7 +138,7 @@ probabilidades <- c(0.01, 0.05, 0.1, 0.15, 0.5, 0.85, 0.9, 0.95, 0.99)
 # Función para calcular DLp y su IC
 calcular_dlp_manual <- function(p) {
   # Valor de probit para la probabilidad p
-  probit_p <- qnorm(p)
+  probit_p <- stats::qnorm(p)
 
   # Calcular log10(DLp)
   log_dlp <- (probit_p - b0) / b1
@@ -169,5 +173,5 @@ resultados_df$Probabilidad <- resultados_df$Probabilidad
 
 
 
-plot(qnorm(resultados_df$Probabilidad), log10(resultados_df$DL), type = "l")
-points(qnorm(data$Presp), log10(data$dosis), pch = 19, col = "red")
+#plot(qnorm(resultados_df$Probabilidad), log10(resultados_df$DL), type = "l")
+#points(qnorm(data$Presp), log10(data$dosis), pch = 19, col = "red")
