@@ -11,8 +11,7 @@ RoxygenNote: 7.3.2
 Imports: 
     magrittr,
     dplyr,
-    stats, 
-    MASS
+    stats
 Depends: 
     R (>= 3.5)
 LazyData: true
