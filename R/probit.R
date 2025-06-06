@@ -5,11 +5,10 @@ probit <- function(data) {
 
   datos <- data_abbot %>% dplyr::filter(data_abbot$dosis!=0)
 
-  model <- stats::glm(Pabbott ~ log10(datos$dosis),
-               family = stats::quasibinomial(link = "probit"),
-               weights = datos$n,
-               data = datos)
-
+  model <- suppressWarnings(glm(Pabbott ~ log10(dosis),
+                                family = binomial(link = "probit"),
+                                weights = n,
+                                data = datos))
 
   summary(model)
   # Calcular LD50 y su intervalo de confianza
@@ -100,7 +99,7 @@ probit <- function(data) {
   # Mostrar resultados
   rownames(resultados_df) <- NULL
 
-  (resultados_df)
+  (model)
 
 
 

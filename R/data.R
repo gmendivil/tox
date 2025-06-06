@@ -1,15 +1,18 @@
-#' World Health Organization TB data
+#' Datos de ejemplo del paquete tox
 #'
-#' A subset of data from the World Health Organization Global Tuberculosis
-#' Report ...
+#' Conjunto de datos de experimentos de toxicidad correspondientes a...
 #'
-#' @format ## `data`
-#' A data frame with 7,240 rows and 60 columns:
+#' @format ## `database_tox`
+#' El dta frame contiene 636 filas y 9 columnas:
 #' \describe{
-#'   \item{country}{Country name}
-#'   \item{iso2, iso3}{2 & 3 letter ISO country codes}
-#'   \item{year}{Year}
-#'   ...
+#'   \item{fecha}{Fecha de realización del ensayo.}
+#'   \item{especie}{Nombre científico de la especie estudiada.}
+#'   \item{n}{Número de individuos testeados.}
+#'   \item{exposicion_horas}{Duración del test en horas.}
+#'   \item{replica}{Número de replicas del ensayo.}
+#'   \item{dosis}{Concentracion de las dósis en ppb.}
+#'   \item{supervivencia}{Número de Individuos que sobrevivieron al test.}
+#'   \item{respuesta}{Número de Individuos que no sobrevivieron al test.}
 #' }
-#' @source <https://www.who.int/teams/global-tuberculosis-programme/data>
-"data"
+#' @source <https://www.ilpla.edu.ar/>
+"database_tox"

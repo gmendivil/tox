@@ -14,3 +14,4 @@ suavizar <- function(x) {
   x$suavizados <- z
   return(x)
 }
+

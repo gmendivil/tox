@@ -1,8 +1,9 @@
 Package: tox
 Title: Cálculo de Toxicidad
-Version: 0.0.0.1
+Version: 0.1
 Authors@R: 
     person("Gabriel", "Mendivil", , "g.mendivil@cidepint.ing.unlp.edu.ar", role = c("aut", "cre"))
+    person("Vivian", "Yoyrojo Moreno", , "vyorojo@gmail.com", role = c("aut", "cre"))
 Description: Cálculo de toxicidad(one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -11,7 +12,9 @@ RoxygenNote: 7.3.2
 Imports: 
     magrittr,
     dplyr,
-    stats
+    stats,
+    scales,
+    ggplot2
 Depends: 
     R (>= 3.5)
 LazyData: true

@@ -1,18 +1,21 @@
-# corr_abbott <- function(df, control = 0){
-#   Pctrl <- df[df$dosis == control, ]
-#   Pctrl <- Pctrl$respuesta / Pctrl$n
-#   #Presp <- datos[datos$dosis != 0, ]
-#   df$Presp <- df$respuesta / df$n
-#   Pcorr <- (df$Presp-Pctrl)/(1- Pctrl )
-#   df$Pcorr <- Pcorr
-#   df$Pcorr <- ifelse(df$Pcorr < 0,  (0.5/(df$n+1)), df$Pcorr)
-#   return(df)
-# }
+#' Correcion de Abbott para datos de mortalidad natural
+#'
+#' @param df data frame
+#' @param control Variable que indica como se codifica la columna control (Por ej.: 0, "control", etc)
+#'
+#' @returns retorna el data frame corregido
+#' @export
+#'
 
 corr_abbott <- function(df, control = 0){
   ctrl <- df[df$dosis == control, ]
-  Pctrl <- ctrl$suavizados
-  Presp <- df[df$dosis != 0, ]
+  if (ctrl$respuesta > 0) { # La condición debe devolver TRUE o FALSE
+    Pctrl <- ctrl$suavizados# Ejecuta un código
+  } else {
+    Pctrl <- 0# Ejecuta otro código
+  }
+
+  Presp <- df[df$dosis != 0, ]  #datos????
   df$Presp <- df$respuesta / df$n
   Pabbott <- (df$Presp-Pctrl)/(1- Pctrl )
   df$Pabbott <- Pabbott
