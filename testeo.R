@@ -14,5 +14,3 @@ modelo_lambda <- tox(Lambda)
 modelo_glufo <- tox(Glufo)
 
 plot_probit_modelos(modelo_glufo, modelo_lambda, model_names = c("Glufosinato", "Lambdacialotrina"))
-#plot(qnorm(resultados_df$Probabilidad), log10(resultados_df$DL), type = "l")
-#points(qnorm(data$Presp), log10(data$dosis), pch = 19, col = "red")
