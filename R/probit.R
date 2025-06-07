@@ -1,5 +1,5 @@
 #' @export
-probit <- function(data) {
+tox <- function(data, link="probit") {
 
   datos_agreg <- agregar(data)
   datos_suav <- suavizar(datos_agreg)
@@ -8,7 +8,7 @@ probit <- function(data) {
   datos <- data_abbot %>% dplyr::filter(data_abbot$dosis!=0)
 
   model <- suppressWarnings(glm(Pabbott ~ log10(dosis),
-                                family = binomial(link = "probit"),
+                                family = binomial(link = link),
                                 weights = n,
                                 data = datos))
 
@@ -84,24 +84,56 @@ probit <- function(data) {
     # Calcular varianza y error estandar
     var_log_dlp <- t(gradiente) %*% vcov_matrix %*% gradiente
     se_log_dlp <- sqrt(var_log_dlp)
-
     # Convertir a escala original y crear dataframe
     data.frame(
-      Punto = p,
-      Concentracion = 10^log_dlp,
-      LCI95 = 10^(log_dlp - 1.96 * se_log_dlp),
-      LCS95 = 10^(log_dlp + 1.96 * se_log_dlp)
+      DL  = p*100,
+      Conc = 10^log_dlp,
+      ICI95 = 10^(log_dlp - 1.96 * se_log_dlp),
+      ICS95 = 10^(log_dlp + 1.96 * se_log_dlp)
     )
   }
 
   # Calcular para todas las probabilidades
   resultados <- lapply(probabilidades, calcular_dlp_manual)
   resultados_df <- do.call(rbind, resultados)
+  ci_lower =  resultados_df[5,3]
+  ci_upper = resultados_df[5,4]
 
   # Mostrar resultados
   rownames(resultados_df) <- NULL
+  colnames(resultados_df) <- c("DL [%]", "Conc. [ppb]", "IC 95% inf. [ppb]","IC 95% sup. [ppb]")
 
-  (model)
+
+
+ cat("############################################################### \n")
+ cat("#             Datos estadísticos del modelo                   # \n")
+ cat("############################################################### \n")
+
+ aa <- summary(model)
+ print(aa, show.residuals = TRUE)
+
+ cat("chi²    gl    p-valor          \n")
+ cat(sprintf("%-5.3f    %-1.0f    %-8.6f\n",
+             model$deviance,
+             model$df.residual,
+             pchisq(model$deviance, model$df.residual, lower.tail = FALSE) ))
+ cat("\n")
+ cat("############################################################### \n")
+ cat("#                      DL Estimadas                           # \n")
+ cat("############################################################### \n\n")
+ print(resultados_df)
+
+
+ list(
+   modelo = model,
+   CorrectedData = datos,
+   LD50 = ld50,
+   LD50_CI = c(ci_lower, ci_upper)
+   # LD50_SE = se_log_ld50,
+   # Slope = slope_midpoint,
+   # Slope_SE = se_slope
+ )
+
 
 
 
