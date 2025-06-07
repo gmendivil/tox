@@ -12,7 +12,7 @@ corr_abbott <- function(df, control = 0){
   if (ctrl$respuesta > 0) { # La condición debe devolver TRUE o FALSE
     Pctrl <- ctrl$suavizados# Ejecuta un código
   } else {
-    Pctrl <- 0# Ejecuta otro código
+    Pctrl <- 0 # Ejecuta otro código
   }
 
   Presp <- df[df$dosis != 0, ]  #datos????

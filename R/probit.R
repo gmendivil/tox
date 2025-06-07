@@ -1,6 +1,8 @@
+#' @export
 probit <- function(data) {
 
-  datos_suav<- suavizar(data)
+  datos_agreg <- agregar(data)
+  datos_suav <- suavizar(datos_agreg)
   data_abbot <- corr_abbott(datos_suav)
 
   datos <- data_abbot %>% dplyr::filter(data_abbot$dosis!=0)

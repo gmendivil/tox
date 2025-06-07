@@ -11,8 +11,9 @@ agregar <- function(df){
   # datos_agregados <- agregar(data) CORREGIR!
 
   datos_agregados <- df %>%
-    dplyr::group_by(df$dosis) %>%
-    dplyr::summarise(respuesta = sum(df$respuesta),
-                     n = sum(df$n))
+    dplyr::group_by(dosis) %>%
+    dplyr::summarise(n=sum(n), respuesta=sum(respuesta))
+
   return(datos_agregados)
 }
+

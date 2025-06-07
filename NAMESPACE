@@ -2,4 +2,5 @@
 
 export("%>%")
 export(corr_abbott)
+export(probit)
 importFrom(magrittr,"%>%")
