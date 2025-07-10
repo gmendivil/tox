@@ -2,6 +2,7 @@
 
 export("%>%")
 export(corr_abbott)
+export(plot_probit)
 export(plot_probit_modelos)
 export(tox)
 importFrom(magrittr,"%>%")

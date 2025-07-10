@@ -1,9 +1,12 @@
 Package: tox
 Title: Cálculo de Toxicidad
 Version: 0.1
-Authors@R: 
-    person("Gabriel", "Mendivil", , "g.mendivil@cidepint.ing.unlp.edu.ar", role = c("aut", "cre"))
-    person("Vivian", "Yoyrojo Moreno", , "vyorojo@gmail.com", role = c("aut", "cre"))
+Authors@R: c(
+    person("Vivian", "Yorojo", role = c("aut"), email = "vyorojo@ilpla.edu.ar"),
+    person("Marina", "Solís", role = c("aut"), email = "marinasolis@ilpla.edu.ar"),
+    person("Gabriel", "Mendivil", role = c("aut", "cre"), email = "g.mendivil@cidepint.ing.unlp.edu.ar"),
+    person("Consejo Nacional de Investigaciones Científicas y Técnicas, CONICET", role = c("cph", "fnd"))
+    )
 Description: Cálculo de toxicidad(one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8

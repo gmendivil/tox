@@ -1,20 +1,9 @@
-library(tox)
-library(dplyr)
-
-datos  <- database_tox  # Se cargan datos de ejemplo del paquete tox
-
-Lambda <- datos%>% filter(especie=="Boana pulchella",
-               exposicion_horas==96,compuesto=="Lambdacialotrina")
-
-Glufo <- datos%>% filter(especie=="Boana pulchella",
-                exposicion_horas==96,compuesto=="Glufosinato")
-
-
+#' @export
 plot_probit <- function(results1, titulo ="Plot Modelo",
-                                ld50_line = TRUE,
-                                ci = TRUE,
-                                model_name = "Modelo 1",
-                                colors = "#4E79A7") {
+                        ld50_line = TRUE,
+                        ci = TRUE,
+                        model_name = "Modelo 1",
+                        colors = "#4E79A7") {
 
   # Función interna para procesar cada modelo
   prepare_model_data <- function(results, color, extended_dosis) {
@@ -106,17 +95,3 @@ plot_probit <- function(results1, titulo ="Plot Modelo",
 
   return(p)
 }
-
-
-
-
-
-
-modelo_lambda <- tox(Lambda)
-plot_probit(modelo_lambda)
-
-modelo_glufo <- tox(Glufo, link="probit")
-plot_probit(modelo_glufo)
-
-plot_probit_modelos(modelo_glufo, modelo_lambda, model_names = c("Glufosinato", "Lambdacialotrina"))
-
