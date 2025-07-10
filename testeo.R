@@ -112,10 +112,10 @@ plot_probit <- function(results1, titulo ="Plot Modelo",
 
 
 
-modelo_lambda <- tox(Lambda)
+modelo_lambda <- tox(Lambda, link = "logit")
 plot_probit(modelo_lambda)
 
-modelo_glufo <- tox(Glufo)
+modelo_glufo <- tox(Glufo, link="probit")
 plot_probit(modelo_glufo)
 
 plot_probit_modelos(modelo_glufo, modelo_lambda, model_names = c("Glufosinato", "Lambdacialotrina"))

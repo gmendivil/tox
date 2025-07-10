@@ -108,7 +108,8 @@ tox <- function(data, link="probit") {
  cat("############################################################### \n")
  cat("#             Datos estadísticos del modelo                   # \n")
  cat("############################################################### \n")
-
+ cat("Función de enlace: ")
+ print(link)
  aa <- summary(model)
  print(aa, show.residuals = TRUE)
 
